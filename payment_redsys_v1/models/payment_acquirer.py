@@ -65,14 +65,6 @@ class PaymentAcquirer(models.Model):
     redsys_signature_version = fields.Selection(
         [("HMAC_SHA256_V1", "HMAC SHA256 V1")], default="HMAC_SHA256_V1"
     )
-    redsys_percent_partial = fields.Float(
-        string="Reduction percent",
-        digits="Account",
-        help="Write percent reduction payment, for this method payment."
-        "With this option you can allow partial payments in your "
-        "shop online, the residual amount in pending for do a manual "
-        "payment later.",
-    )
         
     def _redsys_get_api_url(self):
         """ Return the API URL according to the acquirer state.
