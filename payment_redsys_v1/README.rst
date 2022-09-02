@@ -41,7 +41,7 @@ Configuration
 
 * Ir a Sitio web / Configuración / Comercio electrónico / Métodos de pago.
 * Ir al método de pago Redsys y presionar el botón "Activar".
-* En la tab de "Credenciales" colocar los datos correspondientes a los campos P_CUST_ID_CLIENTE, P_KEY y PUBLIC_KEY, los cuales los puede conseguir en su dashboard de Redsys en el menú de Integraciones / Llaves API en la seccion "LLaves secretas".
+* En la tab de "Credenciales" colocar los datos correspondientes, los cuales los puede conseguir en su dashboard de Redsys.
 
 * Para hacer el método de pago disponible en el ecommerce, pulsar el botón Publicar.
   
@@ -64,10 +64,5 @@ Credits
 Authors
 ~~~~~~~
 
-* Redsys
-
-Contributors
-~~~~~~~~~~~~
-
-* Ricardo Saldarriaga <ricardo.saldarriaga@redsys.com>
+* CodeSystems
 
