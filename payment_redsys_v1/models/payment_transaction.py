@@ -40,12 +40,12 @@ class PaymentTransaction(models.Model):
         :rtype: dict
         """
         res = super()._get_specific_rendering_values(processing_values)
-        if self.provider != 'redsys':
+        if self.provider_code != 'redsys':
             return res
 
-        base_url = self.acquirer_id.get_base_url()
+        base_url = self.provider_id.get_base_url()
         partner_first_name, partner_last_name = payment_utils.split_partner_name(self.partner_name)
-        sqlTestMethod = """select state from payment_acquirer where provider = '%s'
+        sqlTestMethod = """select state from payment_provider where code = '%s'
                         """ % ('redsys')
         http.request.cr.execute(sqlTestMethod)
         resultTestMethod = http.request.cr.fetchall() or []
@@ -79,34 +79,34 @@ class PaymentTransaction(models.Model):
         #tx = self.env['payment.transaction'].search([('reference', '=', self.reference)])
         
         values = {
-            "Ds_Sermepa_Url": self.acquirer_id._redsys_get_api_url(),
+            "Ds_Sermepa_Url": self.provider_id._redsys_get_api_url(),
             "Ds_Merchant_Amount": str(int(round(self.amount * 100))),
-            "Ds_Merchant_Currency": self.acquirer_id.redsys_currency or "978",
+            "Ds_Merchant_Currency": self.provider_id.redsys_currency or "978",
             "Ds_Merchant_Order": (
                 str(self.reference) and str(self.reference)[-12:] or False
             ),
             "Ds_Merchant_MerchantCode": (
-                self.acquirer_id.redsys_merchant_code and self.acquirer_id.redsys_merchant_code[:9]
+                self.provider_id.redsys_merchant_code and self.provider_id.redsys_merchant_code[:9]
             ),
-            "Ds_Merchant_Terminal": self.acquirer_id.redsys_terminal or "1",
-            "Ds_Merchant_TransactionType": (self.acquirer_id.redsys_transaction_type or "0"),
+            "Ds_Merchant_Terminal": self.provider_id.redsys_terminal or "1",
+            "Ds_Merchant_TransactionType": (self.provider_id.redsys_transaction_type or "0"),
             "Ds_Merchant_Titular": partner_first_name + ' '+ partner_last_name,
             "Ds_Merchant_MerchantName": (
-                self.acquirer_id.redsys_merchant_name and self.acquirer_id.redsys_merchant_name[:25]
+                self.provider_id.redsys_merchant_name and self.provider_id.redsys_merchant_name[:25]
             ),
             "Ds_Merchant_MerchantUrl": (
                 "%s/payment/redsys/return" % (base_url)
             )[:250],
-            "Ds_Merchant_MerchantData": self.acquirer_id.redsys_merchant_data or "",
+            "Ds_Merchant_MerchantData": self.provider_id.redsys_merchant_data or "",
             "Ds_Merchant_ProductDescription": (
                 self._product_description(str(self.reference))
-                or self.acquirer_id.redsys_merchant_description
-                and self.acquirer_id.redsys_merchant_description[:125]
+                or self.provider_id.redsys_merchant_description
+                and self.provider_id.redsys_merchant_description[:125]
             ),
-            "Ds_Merchant_ConsumerLanguage": (self.acquirer_id.redsys_merchant_lang or "001"),
+            "Ds_Merchant_ConsumerLanguage": (self.provider_id.redsys_merchant_lang or "001"),
             "Ds_Merchant_UrlOk": urls.url_join(base_url, '/payment/redsys/result/redsys_result_ok'),
             "Ds_Merchant_UrlKo": urls.url_join(base_url, '/payment/redsys/result/redsys_result_ko'),
-            "Ds_Merchant_Paymethods": self.acquirer_id.redsys_pay_method or "T",
+            "Ds_Merchant_Paymethods": self.provider_id.redsys_pay_method or "T",
         }
         
         #_logger.info(values)
@@ -114,15 +114,15 @@ class PaymentTransaction(models.Model):
         merchant_parameters = self._url_encode64(json.dumps(values))
         
         return {
-                "Ds_SignatureVersion": str(self.acquirer_id.redsys_signature_version),
+                "Ds_SignatureVersion": str(self.provider_id.redsys_signature_version),
                 "Ds_MerchantParameters": merchant_parameters.decode("utf-8"),
                 "Ds_Signature": self.sign_parameters(
-                    self.acquirer_id.redsys_secret_key, merchant_parameters.decode("utf-8")
+                    self.provider_id.redsys_secret_key, merchant_parameters.decode("utf-8")
                 ),
-                'api_url': self.acquirer_id._redsys_get_api_url(),
+                'api_url': self.provider_id._redsys_get_api_url(),
             }
         """return {
-            'public_key': self.acquirer_id.redsys_public_key,
+            'public_key': self.provider_id.redsys_public_key,
             'address1': self.partner_address,
             'amount': self.amount,
             'tax': tax,
@@ -202,7 +202,7 @@ class PaymentTransaction(models.Model):
             if tx and not test_env:
                 # verify shasign
                 shasign_check = self.sign_parameters(
-                    tx.acquirer_id.redsys_secret_key, parameters
+                    tx.provider_id.redsys_secret_key, parameters
                 )
                 if shasign_check != shasign:
                     error_msg = (
@@ -231,7 +231,7 @@ class PaymentTransaction(models.Model):
         :raise: ValidationError if inconsistent data were received
         """
         super()._process_feedback_data(data)
-        if self.provider != 'redsys':
+        if self.provider_code != 'redsys':
             return
         
         parameters = data.get("Ds_MerchantParameters", "")

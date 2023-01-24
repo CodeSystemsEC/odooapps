@@ -14,7 +14,7 @@
     'data': [
         'views/payment_views.xml',
         'views/payment_redsys_v1_templates.xml',
-        'data/payment_acquirer_data.xml',
+        'data/payment_provider_data.xml',
     ],
     "external_dependencies": {
         "python3": [
@@ -23,6 +23,7 @@
     },
     'images': ['static/images/screen_image.png'],
     'application': True,
+    'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
     'license': 'LGPL-3',
     'price': 35.00,
