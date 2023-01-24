@@ -25,7 +25,7 @@
     'application': True,
     'post_init_hook': 'post_init_hook',
     'uninstall_hook': 'uninstall_hook',
-    'license': 'LGPL-3',
+    'license': 'OPL-1',
     'price': 35.00,
     'currency': 'USD'
 }
