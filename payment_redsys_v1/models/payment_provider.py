@@ -11,7 +11,7 @@ from odoo.addons.payment_redsys_v1.const import SUPPORTED_CURRENCIES
 _logger = logging.getLogger(__name__)
 
 
-class PaymentAcquirer(models.Model):
+class PaymentProvider(models.Model):
     _inherit = 'payment.provider'
 
     code = fields.Selection(
